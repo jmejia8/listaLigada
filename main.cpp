@@ -32,20 +32,20 @@ public:
 			return true;
 		}
 
-		Nodo* aux = primero;
+		Nodo* actual = primero;
 
-		while (aux != NULL){
-			if (aux->dato > dato){
+		while (actual != NULL){
+			if (actual->dato > dato){
 
-				if (aux->anterior == NULL){
-					el_nuevo->siguiente = aux;
-					aux->anterior = el_nuevo;
+				if (actual->anterior == NULL){
+					el_nuevo->siguiente = actual;
+					actual->anterior = el_nuevo;
 					primero = el_nuevo;
 				}else{
-					el_nuevo->siguiente = aux;
-					el_nuevo->anterior = aux->anterior;
+					el_nuevo->siguiente = actual;
+					el_nuevo->anterior = actual->anterior;
 					// linea conflictiva
-					aux->anterior->siguiente = el_nuevo;
+					actual->anterior->siguiente = el_nuevo;
 				}
 
 
@@ -53,7 +53,7 @@ public:
 				return true;
 			}
 
-			aux = aux->siguiente;
+			actual = actual->siguiente;
 		}
 
 		ultimo->siguiente = el_nuevo;
@@ -65,63 +65,67 @@ public:
 		return true;
 	}
 
-	bool eliminar(int posicion){
-		Nodo* aux = primero;
-
-		if (posicion == 0) {
-			primero = primero->siguiente;
-			delete aux;
-
-			if (primero == NULL)
-				ultimo = NULL;
-
-			return true;
-		}
+	bool eliminar(int dato){
+		Nodo* actual = primero;
 
 
+		while (actual != NULL){
+			if (actual->dato == dato){
 
-		for (int i = 0; aux != NULL; i++){
-			if (posicion == i){
+				if (actual->anterior == NULL and actual->siguiente == NULL) {
+					primero = NULL;
+					ultimo = NULL;
+					delete actual;
+					return true;
+				}
 
-				if (aux->anterior == NULL)
-					primero = aux->siguiente;
+				// si el actual es el primero, cambiamos apuntador primero
+				if (actual->anterior == NULL){
+					primero = actual->siguiente;
+					primero->anterior = NULL;
+				}
+				else
+					actual->anterior->siguiente = actual->siguiente;
 
-				if (aux->siguiente == NULL)
-					ultimo = aux->anterior;
+				// si el actual es el ultimo, cambiamos apuntador ultimo
+				if (actual->siguiente == NULL){
+					ultimo = actual->anterior;
+					ultimo->siguiente = NULL;
+				}
+				else
+					actual->siguiente->anterior = actual->anterior;
 
-
-				aux->anterior->siguiente = aux->siguiente;
-				aux->siguiente->anterior = aux->anterior;
-
-				delete aux;
+				delete actual;
 				return true;
 			}
 
-			aux = aux->siguiente;
+			actual = actual->siguiente;
 		}
 
 		return false;
 	}
 
 	void mostrar(){
-		Nodo* aux = primero;
+		cout << "-=====- L I S T A -=====-\n";
+		Nodo* actual = primero;
 
-		while (aux != NULL){
-			cout << aux->dato << ", ";
-			aux = aux->siguiente;
+		while (actual != NULL){
+			cout << actual->dato << ", ";
+			actual = actual->siguiente;
 		}
 
-		cout << endl;
+		cout << "\n=========================\n\n";
+
 	}
 
 	bool vaciarLista(){
-		Nodo* actual = primero;
 		Nodo* aux = primero;
+		Nodo* actual = primero;
 
-		while (aux != NULL){
-			actual = aux;
-			aux = aux->siguiente;
-			delete actual;
+		while (actual != NULL){
+			aux = actual;
+			actual = actual->siguiente;
+			delete aux;
 		}
 
 		primero = NULL;
@@ -135,9 +139,9 @@ public:
 };
 
 void menu(){
-	cout << "--------------------" << endl;
-	cout << "\nElija una opción"   << endl;
-	cout << "--------------------" << endl;
+	cout << "\n\n===========================" << endl;
+	cout << "\tElija una opción"   << endl;
+	cout << "===========================" << endl;
 	cout << "1. agregar" << endl;
 	cout << "2. mostrar" << endl;
 	cout << "3. eliminar elemento" << endl;
@@ -161,17 +165,22 @@ int main(int argc, char const *argv[])
 		
 		switch(opcion){
 			case 1:
-				cout << "Escribe un entero: ";
+				cout << "Escribe un entero para agregar: ";
 				cin >> opcion;
-				elementos.insertar(opcion);
+				elementos.insertar(opcion)?
+					cout << "Elemento agredado.\n" :
+					cout << "Intente más tarde.\n";
 				break;
 			case 2:
 				elementos.mostrar();
 				break;
 			case 3:
-				cout << "Escribe un entero: ";
+				elementos.mostrar();
+				cout << "Escribe el elemento a eliminar: ";
 				cin >> opcion;
-				elementos.eliminar(opcion);
+				elementos.eliminar(opcion)?
+					cout << "Lo eliminé correctamente.\n":
+					cout << "Dato no existe.\n";
 				break;
 			case 4:
 				elementos.vaciarLista();
